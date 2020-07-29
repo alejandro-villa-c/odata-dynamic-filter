@@ -2,7 +2,7 @@
     <div class="_dynamic-filter-container">
         <div class="_dynamic-filter-row _flex-direction-row" v-show="title !== ''">
             <div class="_dynamic-filter-column">
-                <h1 class="_title">{{ labels.title }}</h1>
+                <h1 class="_title">{{ title }}</h1>
             </div>
         </div>
         <div class="_dynamic-filter-row">
