@@ -1,7 +1,6 @@
 export default class Label {
     constructor(
-        public language: string,
-        public title: string,
+        public languageIsoCode: string,
         public selectFields: string,
         public inputsPlaceholder: string,
         public resetButton: string,

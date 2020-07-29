@@ -1,6 +1,6 @@
 <template>
     <div class="_dynamic-filter-container">
-        <div class="_dynamic-filter-row _flex-direction-row" v-show="displayTitle">
+        <div class="_dynamic-filter-row _flex-direction-row" v-show="title !== ''">
             <div class="_dynamic-filter-column">
                 <h1 class="_title">{{ labels.title }}</h1>
             </div>
@@ -116,8 +116,8 @@ import Labels from './models/Labels';
     }
 })
 class DynamicFilter extends Vue {
-    @Prop({ default: true }) displayTitle: boolean;
-    @Prop() fields: DynamicFilterField[];
+    @Prop({ default: "" }) title: string;
+    @Prop() fields: Array<DynamicFilterField>;
     @Prop({ default: false }) queryStringAsObjectProperty: boolean;
     @Prop({ default: (value: any) => value }) valueModifiers: Array<(value: any) => any>;
     @Prop({ default: 'transparent' }) andOperatorColor: string;
@@ -127,8 +127,7 @@ class DynamicFilter extends Vue {
 
     public labelsByLanguage: Array<Labels> = [
         {
-            language: 'en',
-            title: 'Filters',
+            languageIsoCode: 'en',
             selectFields: '-- Select fields --',
             inputsPlaceholder: 'Value',
             resetButton: 'Reset',
@@ -147,8 +146,7 @@ class DynamicFilter extends Vue {
             }
         },
         {
-            language: 'es',
-            title: 'Filtros',
+            languageIsoCode: 'es',
             selectFields: '-- Seleccione los campos --',
             inputsPlaceholder: 'Valor',
             resetButton: 'Reiniciar',
@@ -167,7 +165,7 @@ class DynamicFilter extends Vue {
             }
         }
     ];
-    public labels: Labels = this.labelsByLanguage.find(x => x.language === this.languageIsoCode);
+    public labels: Labels = this.labelsByLanguage.find(x => x.languageIsoCode === this.languageIsoCode);
     public fieldOptions: DynamicFilterSelectOption[] = [];
     public dynamicFilterFieldType: typeof DynamicFilterFieldType = DynamicFilterFieldType;
     public fieldNamePlaceholder: string = '_fieldName_';
@@ -211,6 +209,7 @@ class DynamicFilter extends Vue {
         }
     ];
     public renderFieldsSelect: boolean = true;
+    public nestedPropertiesSeparator: string = '[]/';
 
     public created(): void {
         this.setLabels();
@@ -335,10 +334,10 @@ class DynamicFilter extends Vue {
 
     public getComparativeExpression(comparativeOperator: string, fieldName: string, value: any): string {
         let comparativeExpression: string = '';
-        const fieldNameIsNestedProperty: boolean = fieldName.indexOf('[]/') > -1;
+        const fieldNameIsNestedProperty: boolean = fieldName.indexOf(this.nestedPropertiesSeparator) > -1;
         let collectionName: string = null;
         if (fieldNameIsNestedProperty) {
-            const fieldSplitted: Array<string> = fieldName.split('[]/');
+            const fieldSplitted: Array<string> = fieldName.split(this.nestedPropertiesSeparator);
             collectionName = fieldSplitted[0];
             fieldName = fieldSplitted[1];
             comparativeExpression += `${collectionName}/any(x:`;
@@ -417,8 +416,8 @@ class DynamicFilter extends Vue {
         const fieldsClone = JSON.parse(JSON.stringify(fields));
         const query: string = this.getFilterQuery(fieldsClone);
         const queryNotNested: string = this.getFilterQuery(fieldsClone.map((field: DynamicFilterField) => {
-            if (field.fieldName.indexOf('[]/') > -1) {
-                field.fieldName = field.fieldName.split('[]/')[1];
+            if (field.fieldName.indexOf(this.nestedPropertiesSeparator) > -1) {
+                field.fieldName = field.fieldName.split(this.nestedPropertiesSeparator)[1];
             }
             return field;
         }));

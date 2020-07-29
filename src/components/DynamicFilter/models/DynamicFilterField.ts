@@ -4,7 +4,7 @@ import LogicalOperatorSelectOption from './LogicalOperatorSelectOption';
 
 export default class DynamicFilterField {
     constructor(
-        /** Filed name on the model */
+        /** Field name on the model */
         public fieldName: string,
         /** Field name for the user */
         public label: string,
