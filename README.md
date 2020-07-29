@@ -177,3 +177,5 @@ This is the event emitted when the search button is clicked. It will pass a **Fi
 ### @reset
 
 Event emitted when the component is resetted to its initial state.
+
+## Thanks to the Solvex company for the help and support: https://solvex.com.do/
