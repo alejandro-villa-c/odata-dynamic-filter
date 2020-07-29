@@ -108,19 +108,25 @@ enum DynamicFilterFieldType {
 
 Only applies for fields of type **DROPDOWN**. These are the options that will display on the dropdown control.
 
-The **DynamicFilterSelectOption** object can be imported as follows:
+The **DynamicFilterSelectOption** object has the following properties:
+
+**label: string** 
+
+This is the text displayed for the option.
+
+**value: any** 
+
+Value of the option.
+
+**selected: boolean** 
+
+Whether the option is selected by default.
+
+It can be imported as follows:
 
 ```javascript
 import { DynamicFilterSelectOption } from 'odata-dynamic-filter';
 ```
-
-It is an object with the following properties:
-
----
-**label: string** This is the text displayed for the option.
-**value: any** Value of the option.
-**selected: boolean** Whether the option is selected by default.
----
 
 **valueModifierIndex: number**
 
