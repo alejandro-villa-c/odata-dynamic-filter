@@ -116,7 +116,7 @@ This is the text displayed for the option.
 
 **value: any** 
 
-Value of the option.
+Value of the option. This can be a string or a number.
 
 **selected: boolean** 
 

@@ -392,9 +392,22 @@ class DynamicFilter extends Vue {
                             if (i > 0) {
                                 filterQuery += this.logicalOperators[1].value;
                             }
-                            filterQuery += this.getComparativeExpression(field.comparativeOperator, field.fieldName, `\'${modifiedValue}\'`);
+                            if (typeof modifiedValue === 'string') {
+                                valueTransformedByField = `\'${modifiedValue}\'`;
+                                filterQuery += this.getComparativeExpression(field.comparativeOperator, field.fieldName, valueTransformedByField);
+                            } else if (typeof modifiedValue === 'number') {
+                                filterQuery += this.getComparativeExpression(field.comparativeOperator, field.fieldName, modifiedValue);
+                            }
                         });
                         filterQuery += ")";
+                        break;
+                    case DynamicFilterFieldType.DROPDOWN:
+                        if (typeof modifiedValue === 'string') {
+                            valueTransformedByField = `\'${modifiedValue}\'`;
+                            filterQuery += this.getComparativeExpression(field.comparativeOperator, field.fieldName, valueTransformedByField);
+                        } else if (typeof modifiedValue === 'number') {
+                            filterQuery += this.getComparativeExpression(field.comparativeOperator, field.fieldName, modifiedValue);
+                        }
                         break;
                     default:
                         valueTransformedByField = `\'${modifiedValue}\'`;
