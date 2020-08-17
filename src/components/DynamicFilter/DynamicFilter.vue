@@ -425,7 +425,7 @@ class DynamicFilter extends Vue {
     }
 
     public search(): void {
-        const fields: DynamicFilterField[] = this.fields.filter(x => x.enabled && x.value);
+        const fields: DynamicFilterField[] = this.fields.filter(x => x.enabled && (x.value !== undefined && x.value !== null));
         const fieldsClone = JSON.parse(JSON.stringify(fields));
         const query: string = this.getFilterQuery(fieldsClone);
         const queryNotNested: string = this.getFilterQuery(fieldsClone.map((field: DynamicFilterField) => {
