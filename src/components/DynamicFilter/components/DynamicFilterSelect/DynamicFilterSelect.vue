@@ -23,16 +23,26 @@
             </template>
         </div>
         <ul class="_dynamic-filter-select-options" v-show="showOptions" v-if="optionsClone && optionsClone.length > 0">
-            <li v-for="option in optionsClone" :key="option.value" :class="{ '_selected-option': option.selected }" @click="selectOption(option)">
-                {{ option.label }}
-                <input type="checkbox" v-if="isMultiselect" :checked="option.selected">
+            <li v-for="option in optionsClone" :key="option.value" :class="{ '_selected-option': option.selected && !allowsOptionRepetition }" @click="selectOption(option)">
+                <span class="_selected-option-label">{{ option.label }}</span>
+                <template v-if="isMultiselect && !allowsOptionRepetition">
+                    <input type="checkbox" v-if="isMultiselect" :checked="option.selected" class="_selected-checkbox">
+                </template>
+                <template v-else>
+                    <span>
+                        ({{ selectedOptions.filter(x => x.value === option.value).length }})
+                    </span>
+                    <span class="_addition-icon">
+                        +
+                    </span>
+                </template>
             </li>
         </ul>
     </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator';
+import { Component, Vue, Prop, Watch } from 'vue-property-decorator';
 import DynamicFilterSelectOption from './models/DynamicFilterSelectOption';
 
 Vue.directive('click-outside', {
@@ -57,6 +67,10 @@ export default class DynamicFilterSelect extends Vue {
     @Prop({ default: true }) addPlaceholderToOptions: boolean;
     @Prop({ default: false }) isMultiselect: boolean;
     @Prop({ default: false }) isStaticPlaceholder: boolean;
+    /** Only applies if it is multiselect */
+    @Prop({ default: false }) allowsOptionRepetition: boolean;
+    /** Only applies if it is multiselect. Has a watcher in case you want to remove one of the repeated options in the parent component. */
+    @Prop({ default: null }) repeatedOptionIndexToRemove: string;
 
     public showOptions: boolean = false;
     public selectedOption: DynamicFilterSelectOption = null;
@@ -71,6 +85,14 @@ export default class DynamicFilterSelect extends Vue {
         }
         if (!this.isMultiselect) {
             this.selectOption(this.optionsClone[0]);
+        }
+    }
+
+    @Watch('repeatedOptionIndexToRemove')
+    public onRepeatedOptionRemoved(index: string): void {
+        const indexInArray: number = this.selectedOptions.map(x => x.index).indexOf(index);
+        if (indexInArray > -1) {
+            this.selectedOptions.splice(indexInArray, 1);
         }
     }
 
@@ -95,18 +117,28 @@ export default class DynamicFilterSelect extends Vue {
             if (!selectedOption.selected) {
                 selectedOption.selected = true;
             }
+            this.$emit('optionSelected', selectedOption);
         } else {
             this.triggerReactivityAfterOptionSelection();
-            if (selectedOption.selected) {
-                selectedOption.selected = false;
-                const optionIndex: number = this.selectedOptions.indexOf(selectedOption);
-                this.selectedOptions.splice(optionIndex, 1);
+            if (!this.allowsOptionRepetition) {
+                if (selectedOption.selected) {
+                    selectedOption.selected = false;
+                    const optionIndex: number = this.selectedOptions.indexOf(selectedOption);
+                    this.selectedOptions.splice(optionIndex, 1);
+                } else {
+                    selectedOption.selected = true;
+                    this.selectedOptions.push(selectedOption);
+                }
+                this.$emit('optionSelected', selectedOption);
             } else {
                 selectedOption.selected = true;
-                this.selectedOptions.push(selectedOption);
+                const previouslyAdded: number = this.selectedOptions.filter(x => x.value === selectedOption.value).length;
+                const selectedOptionClone: DynamicFilterSelectOption = JSON.parse(JSON.stringify(selectedOption));
+                selectedOptionClone.index = selectedOptionClone.value + previouslyAdded;
+                this.selectedOptions.push(selectedOptionClone);
+                this.$emit('optionSelected', selectedOptionClone);
             }
         }
-        this.$emit('optionSelected', selectedOption);
     }
 
     public multipleSelectionDisplay(options: DynamicFilterSelectOption[]): string {
@@ -196,17 +228,24 @@ export default class DynamicFilterSelect extends Vue {
         margin-top: 0;
     }
 
-    ._dynamic-filter-select-options > li > input[type=checkbox] {
+    ._selected-checkbox, ._addition-icon {
         display: flex;
         flex-direction: row;
         margin-left: auto;
         margin-top: auto;
         margin-bottom: auto;
+        cursor: pointer;
+    }
+
+    ._selected-checkbox {
         width: 18px;
         height: 18px;
         min-width: 18px;
         min-height: 18px;
-        cursor: pointer;
+    }
+
+    ._addition-icon {
+        font-size: 24px;
     }
 
     ._selected-option {
@@ -215,5 +254,9 @@ export default class DynamicFilterSelect extends Vue {
 
     ._selected-option-arrow {
         margin-left: auto;
+    }
+
+    ._selected-option-label {
+        margin-right: 5px;
     }
 </style>

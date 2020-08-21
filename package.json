@@ -1,6 +1,6 @@
 {
     "name": "odata-dynamic-filter",
-    "version": "0.1.15",
+    "version": "0.1.16",
     "description": "VueJS dynamic filter component with TypeScript support for querying OData endpoints",
     "keywords": [
         "VueJS",

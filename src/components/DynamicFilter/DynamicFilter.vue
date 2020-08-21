@@ -11,6 +11,8 @@
                     v-if="renderFieldsSelect"
                     :options="fieldOptions"
                     :isMultiselect="true"
+                    :allowsOptionRepetition="true"
+                    :repeatedOptionIndexToRemove="repeatedFieldIndexToRemove"
                     :placeholder="labels.selectFields"
                     :addPlaceholderToOptions="false"
                     :isStaticPlaceholder="true"
@@ -18,11 +20,11 @@
                 </dynamic-filter-select>
             </div>
         </div>
-        <div class="_dynamic-filter-row _flex-direction-column" v-show="fields && fields.filter(x => x.enabled).length > 0">
+        <div class="_dynamic-filter-row _flex-direction-column" v-show="fields && fieldsToFilterBy.length > 0">
             <div class="_dynamic-filter-row _flex-direction-row" 
-                v-for="(field, index) in fields.filter(x => x.enabled)" 
-                :key="field.fieldName" 
-                :style="'background-color: ' + (field.logicalOperator && index !== fields.filter(x => x.enabled).length - 1 ? field.logicalOperator.color : 'transparent')">
+                v-for="(field, index) in fieldsToFilterBy" 
+                :key="field.fieldId"
+                :style="'background-color: ' + (field.logicalOperator && index !== fieldsToFilterBy.length - 1 ? field.logicalOperator.color : 'transparent')">
                 <div class="_dynamic-filter-row" v-if="field.fieldName">
                     <div class="_dynamic-filter-column">
                         <input type="text" class="_dynamic-filter-input" disabled v-model="field.label" />
@@ -78,19 +80,21 @@
                                 @keydown="validateDateInput($event)">
                         </template>
                     </div>
-                    <div class="_dynamic-filter-column">
+                    <div class="_dynamic-filter-column" v-if="index !== fieldsToFilterBy.length - 1">
                         <dynamic-filter-select
-                            v-if="index !== fields.filter(x => x.enabled).length - 1"
                             :options="logicalOperators"
                             :placeholder="null"
                             @optionSelected="logicalOperatorSelected($event, field)">
                         </dynamic-filter-select>
                     </div>
+                    <div class="_dynamic-filter-column">
+                        <span class="_remove-filter-icon" @click="removeField(field)">X</span>
+                    </div>
                 </div>
             </div>
         </div>
         <div class="_dynamic-filter-row">
-            <button class="_dynamic-filter-button" @click="resetFieldOptions">
+            <button class="_dynamic-filter-button" @click="resetFields">
                 {{ labels.resetButton }}
             </button>
             <button class="_dynamic-filter-button" @click="search">
@@ -125,10 +129,12 @@ class DynamicFilter extends Vue {
     @Prop({ default: 'en' }) languageIsoCode: string;
     @Prop({ default: null }) i18n: Labels;
 
+    public fieldsToFilterBy: Array<DynamicFilterField> = [];
+    public repeatedFieldIndexToRemove: string = null;
     public labelsByLanguage: Array<Labels> = [
         {
             languageIsoCode: 'en',
-            selectFields: '-- Select fields --',
+            selectFields: '-- Select the fields --',
             inputsPlaceholder: 'Value',
             resetButton: 'Reset',
             searchButton: 'Search',
@@ -290,8 +296,9 @@ class DynamicFilter extends Vue {
     public fieldOptionSelected(option: DynamicFilterSelectOption): void {
         const field: DynamicFilterField = this.fields.find((field: DynamicFilterField) => field.fieldName === option.value);
         if (field) {
-            field.enabled = option.selected;
-            this.$set(this.fields, this.fields.indexOf(field), field);
+            const fieldClone: DynamicFilterField = JSON.parse(JSON.stringify(field));
+            fieldClone.fieldId = option.index;
+            this.fieldsToFilterBy.push(fieldClone);
         }
     }
 
@@ -320,11 +327,8 @@ class DynamicFilter extends Vue {
         }
     }
 
-    public resetFieldOptions(): void {
-        this.fields.forEach((field: DynamicFilterField) => {
-            field.value = null;
-            field.enabled = false;
-        });
+    public resetFields(): void {
+        this.fieldsToFilterBy = [];
         this.renderFieldsSelect = false;
         this.$nextTick().then(() => {
             this.renderFieldsSelect = true;
@@ -372,7 +376,7 @@ class DynamicFilter extends Vue {
         let filterQuery: string = !this.queryStringAsObjectProperty ? '?$filter=' : '';
 
         if (fields && fields.length > 0) {
-            fields.filter(x => x.enabled).forEach((field: DynamicFilterField, index: number) => {
+            fields.forEach((field: DynamicFilterField, index: number) => {
                 let modifiedValue = field.value;
                 if (field.valueModifierIndex || field.valueModifierIndex === 0) {
                     modifiedValue = this.valueModifiers[field.valueModifierIndex](modifiedValue);
@@ -425,7 +429,7 @@ class DynamicFilter extends Vue {
     }
 
     public search(): void {
-        const fields: DynamicFilterField[] = this.fields.filter(x => x.enabled && (x.value !== undefined));
+        const fields: DynamicFilterField[] = this.fieldsToFilterBy.filter(x => x.value !== undefined);
         const fieldsClone = JSON.parse(JSON.stringify(fields));
         const query: string = this.getFilterQuery(fieldsClone);
         const queryNotNested: string = this.getFilterQuery(fieldsClone.map((field: DynamicFilterField) => {
@@ -439,6 +443,14 @@ class DynamicFilter extends Vue {
             query,
             queryNotNested
         ));
+    }
+
+    public removeField(field: DynamicFilterField): void {
+        const index: number = this.fieldsToFilterBy.map(x => x.fieldId).indexOf(field.fieldId);
+        if (index > -1) {
+            this.fieldsToFilterBy.splice(index, 1);
+        }
+        this.repeatedFieldIndexToRemove = field.fieldId;
     }
 
     public stringToDate(date: string): Date {
@@ -544,5 +556,12 @@ export { DynamicFilterSelect, DynamicFilterField, DynamicFilterFieldType, Dynami
         align-self: flex-start;
         margin-top: auto;
         margin-bottom: auto;
+    }
+
+    ._remove-filter-icon {
+        margin-top: auto;
+        margin-bottom: auto;
+        font-size: 22px;
+        cursor: pointer;
     }
 </style>

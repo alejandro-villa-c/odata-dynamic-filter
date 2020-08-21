@@ -176,7 +176,7 @@ This prop is an object that define the labels used in the component. Below is an
 ```javascript
 {
     languageIsoCode: 'en',
-    selectFields: '-- Select fields --',
+    selectFields: '-- Select the fields --',
     inputsPlaceholder: 'Value',
     resetButton: 'Reset',
     searchButton: 'Search',

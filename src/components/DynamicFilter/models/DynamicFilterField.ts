@@ -12,17 +12,17 @@ export default class DynamicFilterField {
         public type: DynamicFilterFieldType,
         /** Options for the dropdown in case it is */
         public options?: DynamicFilterSelectOption[],
+        /** Index of the array of functions that transform the value before constructing the query */
+        public valueModifierIndex?: number,
         /** Comparative operators allowed in this type of field */
         public comparativeOperators?: DynamicFilterSelectOption[],
-        /** Whether the field was selected to filter by */
-        public enabled?: boolean,
         /** Value of the operator selected */
         public comparativeOperator?: string,
         /** Value inserted to filter by */
         public value?: any,
         /** Logical operator and/or selected */
         public logicalOperator?: LogicalOperatorSelectOption,
-        /** Index of the array of functions that transform the value before constructing the query */
-        public valueModifierIndex?: number
+        /** Field unique identifier */
+        public fieldId?: string
     ) {}
 }
