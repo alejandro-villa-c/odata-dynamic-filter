@@ -1,8 +1,8 @@
 export enum DynamicFilterFieldType {
-    TEXT,
-    NUMBER,
-    CHECKBOX,
-    DROPDOWN,
-    DATEPICKER,
-    MULTIPLE_DROPDOWN
+    TEXT = 1,
+    NUMBER = 2,
+    CHECKBOX = 3,
+    DATEPICKER = 4,
+    DROPDOWN = 5,
+    MULTIPLE_DROPDOWN = 6
 }

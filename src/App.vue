@@ -64,6 +64,25 @@ export default class App extends Vue {
             fieldName: 'isMarried',
             label: 'Is Married',
             type: DynamicFilterFieldType.CHECKBOX
+        },
+        {
+            fieldName: 'pet',
+            label: 'Pet',
+            type: DynamicFilterFieldType.MULTIPLE_DROPDOWN,
+            options: [
+                {
+                    label: 'Dog',
+                    value: 'dog'
+                },
+                {
+                    label: 'Cat',
+                    value: 'cat'
+                },
+                {
+                    label: 'Fish',
+                    value: 'fish'
+                }
+            ]
         }
     ];
 

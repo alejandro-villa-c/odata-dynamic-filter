@@ -77,14 +77,20 @@ import { DynamicFilterField } from 'odata-dynamic-filter';
 
 The properties of this object are:
 
+---
+
 **fieldName: string**
 
 This is the name of the property of the model you will be filtering in OData. Supports **nested properties** to filter by.
 For example, assume you have a Person model with a list of Cars, providing the value: ```'Cars[]/Brand'``` would let you query by the brands of the cars owned by each person.
 
+---
+
 **label: string** 
 
 This is the label that will be visible for this field on the input of the form.
+
+---
 
 **type: DynamicFilterFieldType** 
 
@@ -95,18 +101,32 @@ import { DynamicFilterFieldType } from 'odata-dynamic-filter';
 This enum has the following structure which is very descriptive:
 ```javascript
 enum DynamicFilterFieldType {
-    TEXT,
-    NUMBER,
-    CHECKBOX,
-    DROPDOWN,
-    DATEPICKER,
-    MULTIPLE_DROPDOWN
+    TEXT = 1,
+    NUMBER = 2,
+    CHECKBOX = 3,
+    DATEPICKER = 4,
+    DROPDOWN = 5,
+    MULTIPLE_DROPDOWN = 6
 }
 ```
+The **TEXT** type renders a text input for string values.
+The **NUMBER** type renders an input which only allows numbers.
+The **CHECKBOX** type renders a checkbox which is used for boolean values of true/false.
+The **DATEPICKER** type renders an input with a mask for dates in the *dd/MM/yyyy* format. However, the value in the generated query string will be in the *yyyy-mm-dd* format.
+The **DROPDOWN** type lets you define an array of options of possible values to filter by.
+The **MULTIPLE_DROPDOWN** type works like the DROPDOWN type but additionally lets you select multiple values at the same time.
+
+---
 
 **options: Array\<DynamicFilterSelectOption\>**
 
-Only applies for fields of type **DROPDOWN**. These are the options that will display on the dropdown control.
+Only applies for fields of type **DROPDOWN** or **MULTIPLE_DROPDOWN**. These are the options that will display on the dropdown control.
+
+It can be imported as follows:
+
+```javascript
+import { DynamicFilterSelectOption } from 'odata-dynamic-filter';
+```
 
 The **DynamicFilterSelectOption** object has the following properties:
 
@@ -122,15 +142,13 @@ Value of the option. This can be a string or a number.
 
 Whether the option is selected by default.
 
-It can be imported as follows:
-
-```javascript
-import { DynamicFilterSelectOption } from 'odata-dynamic-filter';
-```
+---
 
 **valueModifierIndex: number**
 
-This is the index of the value modifier function to use in the array of functions of the **valueModifiers** prop (explained below).
+This is the index of the value modifier function to use in the array of functions of the **valueModifiers** prop. Below is an explanation of how this prop works.
+
+---
 
 ## valueModifiers: Array<(value: any) => any>
 

@@ -25,16 +25,18 @@
         <ul class="_dynamic-filter-select-options" v-show="showOptions" v-if="optionsClone && optionsClone.length > 0">
             <li v-for="option in optionsClone" :key="option.value" :class="{ '_selected-option': option.selected && !allowsOptionRepetition }" @click="selectOption(option)">
                 <span class="_selected-option-label">{{ option.label }}</span>
-                <template v-if="isMultiselect && !allowsOptionRepetition">
-                    <input type="checkbox" v-if="isMultiselect" :checked="option.selected" class="_selected-checkbox">
-                </template>
-                <template v-else>
-                    <span>
-                        ({{ selectedOptions.filter(x => x.value === option.value).length }})
-                    </span>
-                    <span class="_addition-icon">
-                        +
-                    </span>
+                <template v-if="isMultiselect">
+                    <template v-if="!allowsOptionRepetition">
+                        <input type="checkbox" v-if="isMultiselect" :checked="option.selected" class="_selected-checkbox">
+                    </template>
+                    <template v-else>
+                        <span>
+                            ({{ selectedOptions.filter(x => x.value === option.value).length }})
+                        </span>
+                        <span class="_addition-icon">
+                            +
+                        </span>
+                    </template>
                 </template>
             </li>
         </ul>
