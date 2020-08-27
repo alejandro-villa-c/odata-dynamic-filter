@@ -109,11 +109,17 @@ enum DynamicFilterFieldType {
     MULTIPLE_DROPDOWN = 6
 }
 ```
+
 The **TEXT** type renders a text input for string values.
+
 The **NUMBER** type renders an input which only allows numbers.
+
 The **CHECKBOX** type renders a checkbox which is used for boolean values of true/false.
+
 The **DATEPICKER** type renders an input with a mask for dates in the *dd/MM/yyyy* format. However, the value in the generated query string will be in the *yyyy-mm-dd* format.
+
 The **DROPDOWN** type lets you define an array of options of possible values to filter by.
+
 The **MULTIPLE_DROPDOWN** type works like the DROPDOWN type but additionally lets you select multiple values at the same time.
 
 ---
