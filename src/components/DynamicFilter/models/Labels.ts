@@ -3,6 +3,8 @@ export default class Label {
         public languageIsoCode: string,
         public selectFields: string,
         public inputsPlaceholder: string,
+        public dropdownPlaceholder: string,
+        public multipleSelection: string,
         public resetButton: string,
         public searchButton: string,
         public comparativeOperators: {

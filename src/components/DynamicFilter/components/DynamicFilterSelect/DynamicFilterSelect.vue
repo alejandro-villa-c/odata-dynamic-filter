@@ -65,8 +65,9 @@ Vue.directive('click-outside', {
 export default class DynamicFilterSelect extends Vue {
     @Prop() options: DynamicFilterSelectOption[];
     @Prop({ default: false }) disabled: boolean;
-    @Prop({ default: 'Seleccione una opción' }) placeholder: string;
+    @Prop({ default: 'Select an option' }) placeholder: string;
     @Prop({ default: true }) addPlaceholderToOptions: boolean;
+    @Prop({ default: 'selected options' }) multipleSelectionLabel: string;
     @Prop({ default: false }) isMultiselect: boolean;
     @Prop({ default: false }) isStaticPlaceholder: boolean;
     /** Only applies if it is multiselect */
@@ -144,7 +145,7 @@ export default class DynamicFilterSelect extends Vue {
     }
 
     public multipleSelectionDisplay(options: DynamicFilterSelectOption[]): string {
-        let label: string = `${options.length} opciones seleccionadas`;
+        let label: string = `${options.length} ${this.multipleSelectionLabel}`;
         if (options.length < 4) {
             label = options.map(x => x.label).join(", ");
         }

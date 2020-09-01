@@ -181,6 +181,10 @@ This prop just indicates whether to append the ```'?$filter=' ``` string fragmen
 
 This will be the title to display in the form. Not providing a value will just not display any title.
 
+## buttonClass: string
+
+This will override the class used for the buttons in the component. This way you can insert your own button styles or button classes from any css framework.
+
 ## andOperatorColor: string
 
 Sometimes you want the entire row of a form where you selected the **and** operator to have a background color so that it can be easily differentiated from a row using the **or** operator. This prop defines the color that will be used. Any HTML supported color is valid.
@@ -200,8 +204,10 @@ This prop is an object that define the labels used in the component. Below is an
 ```javascript
 {
     languageIsoCode: 'en',
-    selectFields: '-- Select the fields --',
+    selectFields: 'Select the fields',
     inputsPlaceholder: 'Value',
+    dropdownPlaceholder: 'Select an option',
+    multipleSelection: 'selected options',
     resetButton: 'Reset',
     searchButton: 'Search',
     comparativeOperators: {

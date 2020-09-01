@@ -11,6 +11,7 @@
                     v-if="renderFieldsSelect"
                     :options="fieldOptions"
                     :isMultiselect="true"
+                    :multipleSelectionLabel="labels.multipleSelection"
                     :allowsOptionRepetition="true"
                     :repeatedOptionIndexToRemove="repeatedFieldIndexToRemove"
                     :placeholder="labels.selectFields"
@@ -62,7 +63,9 @@
                             <dynamic-filter-select
                                 :options="field.options"
                                 :isMultiselect="true"
+                                :multipleSelectionLabel="labels.multipleSelection"
                                 :addPlaceholderToOptions="false"
+                                :placeholder="labels.dropdownPlaceholder"
                                 @optionSelected="dropdownOptionSelected($event, field)">
                             </dynamic-filter-select>
                         </template>
@@ -89,7 +92,7 @@
                         </dynamic-filter-select>
                     </div>
                     <div class="_dynamic-filter-column">
-                        <button class="_dynamic-filter-button _remove-filter-icon-button" @click="removeField(field)">
+                        <button :class="[buttonClass, '_remove-filter-icon-button']" @click="removeField(field)">
                             <span class="_remove-filter-icon">X</span>
                         </button>
                     </div>
@@ -97,12 +100,12 @@
             </div>
         </div>
         <div class="_dynamic-filter-row">
-            <button class="_dynamic-filter-button _dynamic-filter-action-button" @click="resetFields">
+            <button :class="[buttonClass, '_dynamic-filter-action-button']" @click="resetFields">
                 <span class="_dynamic-filter-action-text">
                     {{ labels.resetButton }}
                 </span>
             </button>
-            <button class="_dynamic-filter-button _dynamic-filter-action-button" @click="search">
+            <button :class="[buttonClass, '_dynamic-filter-action-button']" @click="search">
                 <span class="_dynamic-filter-action-text">
                     {{ labels.searchButton }}
                 </span>
@@ -135,14 +138,17 @@ class DynamicFilter extends Vue {
     @Prop({ default: 'transparent' }) orOperatorColor: string;
     @Prop({ default: 'en' }) languageIsoCode: string;
     @Prop({ default: null }) i18n: Labels;
+    @Prop({ default: '_dynamic-filter-button' }) buttonClass: string;
 
     public fieldsToFilterBy: Array<DynamicFilterField> = [];
     public repeatedFieldIndexToRemove: string = null;
     public labelsByLanguage: Array<Labels> = [
         {
             languageIsoCode: 'en',
-            selectFields: '-- Select the fields --',
+            selectFields: 'Select the fields',
             inputsPlaceholder: 'Value',
+            dropdownPlaceholder: 'Select an option',
+            multipleSelection: 'selected options',
             resetButton: 'Reset',
             searchButton: 'Search',
             comparativeOperators: {
@@ -160,8 +166,10 @@ class DynamicFilter extends Vue {
         },
         {
             languageIsoCode: 'es',
-            selectFields: '-- Seleccione los campos --',
+            selectFields: 'Seleccione los campos',
             inputsPlaceholder: 'Valor',
+            dropdownPlaceholder: 'Seleccione una opción',
+            multipleSelection: 'opciones seleccionadas',
             resetButton: 'Reiniciar',
             searchButton: 'Buscar',
             comparativeOperators: {
@@ -592,6 +600,8 @@ export { DynamicFilterSelect, DynamicFilterField, DynamicFilterFieldType, Dynami
         padding-left: 1em;
         padding-right: 1em;
         padding-top: 0.5em;
+        margin-right: 10px;
+        margin-left: 10px;
     }
 
     ._dynamic-filter-action-text {
@@ -603,6 +613,8 @@ export { DynamicFilterSelect, DynamicFilterField, DynamicFilterFieldType, Dynami
         height: 30px;
         margin-top: auto;
         margin-bottom: auto;
+        margin-left: auto;
+        margin-right: auto;
     }
 
     ._remove-filter-icon {
