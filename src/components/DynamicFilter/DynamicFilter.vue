@@ -91,7 +91,7 @@
                             @optionSelected="logicalOperatorSelected($event, field)">
                         </dynamic-filter-select>
                     </div>
-                    <div class="_dynamic-filter-column">
+                    <div class="_dynamic-filter-column-auto">
                         <button :class="[buttonClass, '_remove-filter-icon-button']" @click="removeField(field)">
                             <span class="_remove-filter-icon">X</span>
                         </button>
@@ -217,23 +217,24 @@ class DynamicFilter extends Vue {
             value: ' le '
         }
     ];
-    public logicalOperators: LogicalOperatorSelectOption[] = [
-        {
-            label: this.labels.logicalOperators.and,
-            value: ' and ',
-            color: this.andOperatorColor
-        },
-        {
-            label: this.labels.logicalOperators.or,
-            value: ' or ',
-            color: this.orOperatorColor
-        }
-    ];
+    public logicalOperators: LogicalOperatorSelectOption[] = [];
     public renderFieldsSelect: boolean = true;
     public nestedPropertiesSeparator: string = '[]/';
 
     public created(): void {
         this.setLabels();
+        this.logicalOperators = [
+            {
+                label: this.labels.logicalOperators.and,
+                value: ' and ',
+                color: this.andOperatorColor
+            },
+            {
+                label: this.labels.logicalOperators.or,
+                value: ' or ',
+                color: this.orOperatorColor
+            }
+        ];
         this.initFields();
         this.setDynamicFilterFieldOptions();
     }
@@ -571,11 +572,11 @@ export { DynamicFilterSelect, DynamicFilterField, DynamicFilterFieldType, Dynami
 
     ._dynamic-filter-row {
         display: flex;
-        padding-top: 8px;
-        padding-bottom: 8px;
         width: fit-content;
         border-radius: 4px;
         flex-wrap: wrap;
+        margin-top: 5px;
+        margin-bottom: 5px;
     }
 
     ._flex-direction-row {

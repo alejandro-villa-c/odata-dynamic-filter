@@ -5,11 +5,16 @@
     font-family: Arial, Helvetica, sans-serif;
 }
 
-._dynamic-filter-column {
+._dynamic-filter-column, ._dynamic-filter-column-auto {
     margin-left: 10px;
     margin-right: 10px;
-    min-width: 200px;
+    margin-top: 10px;
+    margin-bottom: 10px;
     display: flex;
+}
+
+._dynamic-filter-column {
+    min-width: 200px;
 }
 
 ._dynamic-filter-button {
@@ -44,6 +49,8 @@
 ._dynamic-filter-checkbox-container {
     display: flex;
     height: 100%;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 ._dynamic-filter-checkbox {
