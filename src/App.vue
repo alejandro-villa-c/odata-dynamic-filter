@@ -33,7 +33,7 @@ export default class App extends Vue {
         {
             fieldName: 'percentage',
             label: 'Percentage',
-            type: DynamicFilterFieldType.NUMBER,
+            type: DynamicFilterFieldType.DOUBLE,
             valueModifierIndex: 0
         },
         {

@@ -103,16 +103,19 @@ This enum has the following structure which is very descriptive:
 enum DynamicFilterFieldType {
     TEXT = 1,
     NUMBER = 2,
-    CHECKBOX = 3,
-    DATEPICKER = 4,
-    DROPDOWN = 5,
-    MULTIPLE_DROPDOWN = 6
+    DOUBLE = 3,
+    CHECKBOX = 4,
+    DATEPICKER = 5,
+    DROPDOWN = 6,
+    MULTIPLE_DROPDOWN = 7
 }
 ```
 
 The **TEXT** type renders a text input for string values.
 
-The **NUMBER** type renders an input which only allows numbers.
+The **NUMBER** type renders an input which only allows numbers. This also allows decimals, which OData interprets as being of type decimal by default.
+
+The **DOUBLE** type renders an input which only allows numbers. Use this type if you need to specify that the number type is a double.
 
 The **CHECKBOX** type renders a checkbox which is used for boolean values of true/false.
 
@@ -138,11 +141,11 @@ The **DynamicFilterSelectOption** object has the following properties:
 
 **label: string** 
 
-This is the text displayed for the option.
+This is the label text displayed for the option.
 
 **value: any** 
 
-Value of the option. This can be a string or a number.
+Value of the option. If the field is of type MULTIPLE_DROPDOWN, it can only be a string. OData doesn't allow the use of the 'contains' operator on numbers.
 
 **selected: boolean** 
 

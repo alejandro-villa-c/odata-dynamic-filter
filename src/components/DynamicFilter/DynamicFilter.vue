@@ -45,7 +45,7 @@
                                 class="_dynamic-filter-input"
                                 v-model="field.value">
                         </template>
-                        <template v-if="field.type === dynamicFilterFieldType.NUMBER">
+                        <template v-if="field.type === dynamicFilterFieldType.NUMBER || field.type === dynamicFilterFieldType.DOUBLE">
                             <input 
                                 type="number"
                                 :placeholder="labels.inputsPlaceholder"
@@ -270,6 +270,14 @@ class DynamicFilter extends Vue {
                         field.comparativeOperators.push(comparativeOperatorsClone[4]);
                         field.comparativeOperators.push(comparativeOperatorsClone[5]);
                         break;
+                    case DynamicFilterFieldType.DOUBLE:
+                        field.comparativeOperator = comparativeOperatorsClone[1].value;
+                        field.comparativeOperators.push(comparativeOperatorsClone[1]);
+                        field.comparativeOperators.push(comparativeOperatorsClone[2]);
+                        field.comparativeOperators.push(comparativeOperatorsClone[3]);
+                        field.comparativeOperators.push(comparativeOperatorsClone[4]);
+                        field.comparativeOperators.push(comparativeOperatorsClone[5]);
+                        break;
                     case DynamicFilterFieldType.CHECKBOX:
                         field.comparativeOperator = comparativeOperatorsClone[1].value;
                         field.comparativeOperators.push(comparativeOperatorsClone[1]);
@@ -281,9 +289,11 @@ class DynamicFilter extends Vue {
                         if (field.options.length > 0) {
                             field.value = field.options[0].value;
                         }
-                        field.comparativeOperator = comparativeOperatorsClone[0].value;
-                        field.comparativeOperators.push(comparativeOperatorsClone[0]);
+                        field.comparativeOperator = comparativeOperatorsClone[1].value;
                         field.comparativeOperators.push(comparativeOperatorsClone[1]);
+                        if (!field.options.some(x => typeof x.value === 'number')) {
+                            field.comparativeOperators.push(comparativeOperatorsClone[0]);
+                        }
                         break;
                     case DynamicFilterFieldType.MULTIPLE_DROPDOWN:
                         if (!field.options) {
@@ -291,7 +301,9 @@ class DynamicFilter extends Vue {
                         }
                         field.comparativeOperator = comparativeOperatorsClone[0].value;
                         field.comparativeOperators.push(comparativeOperatorsClone[0]);
-                        field.comparativeOperators.push(comparativeOperatorsClone[1]);
+                        if (!field.options.every(x => typeof x.value === 'string')) {
+                            console.error('ODataDynamicFilterError: Options of MULTIPLE_DROPDOWN fields only allow values of type string.');
+                        }
                         break;
                     case DynamicFilterFieldType.DATEPICKER:
                         field.value = this.formatDate(new Date());
@@ -313,7 +325,7 @@ class DynamicFilter extends Vue {
 
     public fieldOptionSelected(option: DynamicFilterSelectOption): void {
         const field: DynamicFilterField = this.fields.find((field: DynamicFilterField) => field.fieldName === option.value);
-        if (field) {
+        if (!!field) {
             const fieldClone: DynamicFilterField = JSON.parse(JSON.stringify(field));
             fieldClone.fieldId = option.index;
             this.fieldsToFilterBy.push(fieldClone);
@@ -407,6 +419,10 @@ class DynamicFilter extends Vue {
                         break;
                     case DynamicFilterFieldType.NUMBER:
                         filterQuery += this.getComparativeExpression(field.comparativeOperator, field.fieldName, modifiedValue);
+                        break;
+                    case DynamicFilterFieldType.DOUBLE:
+                        valueTransformedByField = modifiedValue + 'd';
+                        filterQuery += this.getComparativeExpression(field.comparativeOperator, field.fieldName, valueTransformedByField);
                         break;
                     case DynamicFilterFieldType.MULTIPLE_DROPDOWN:
                         filterQuery += "(";
@@ -504,41 +520,47 @@ class DynamicFilter extends Vue {
     }
 
     public validateDateInput(event: KeyboardEvent): void {
+        const aLetterKeyCode: number = 65;
+        const cLetterKeyCode: number = 67;
+        const zLetterKeyCode: number = 90;
         const leftArrowKeyCode: number = 37;
         const rightArrowKeyCode: number = 39;
-        const keyIsLeftOrRightArrow: boolean = event.keyCode === leftArrowKeyCode || event.keyCode === rightArrowKeyCode;
         const backspaceKeyCode: number = 8;
+        const keyIsLeftOrRightArrow: boolean = event.keyCode === leftArrowKeyCode || event.keyCode === rightArrowKeyCode;
         const keyIsBackspace: boolean = event.keyCode === backspaceKeyCode;
+        const keyIsAOrCOrZ: boolean = event.keyCode === aLetterKeyCode || event.keyCode === cLetterKeyCode || event.keyCode === zLetterKeyCode;
+        const evntHasCtrlKey: boolean = event.ctrlKey === true;
+        const evntIsSelectionOrCopyOrUndo: boolean = keyIsAOrCOrZ && evntHasCtrlKey;
         const key: string = event.key;
         const onlyDigits: boolean = (/^\d+$/).test(key);
-        if (!(onlyDigits || keyIsBackspace || keyIsLeftOrRightArrow)) {
+        if (!(onlyDigits || keyIsBackspace || keyIsLeftOrRightArrow || evntIsSelectionOrCopyOrUndo)) {
             event.preventDefault();
             return;
         }
 
-        const dateInput: any = (event.target as any);
+        const dateInput: HTMLInputElement = (event.target as HTMLInputElement);
         if (dateInput) {
             const caretPosition: number = dateInput.selectionStart;
-            if (!((caretPosition === dateInput.value.length) || keyIsLeftOrRightArrow)) {
+            if (!((caretPosition === 0) || (caretPosition === dateInput.value.length) || keyIsLeftOrRightArrow || evntIsSelectionOrCopyOrUndo)) {
                 event.preventDefault();
                 return;
             }
 
             const lengthLessThanTen: boolean = dateInput.value.length < 10;
-            if (!(lengthLessThanTen || keyIsBackspace || keyIsLeftOrRightArrow)) {
+            if (!(lengthLessThanTen || keyIsBackspace || keyIsLeftOrRightArrow || evntIsSelectionOrCopyOrUndo)) {
                 event.preventDefault();
                 return;
             }
 
             switch(caretPosition) {
                 case 0:
-                    if (!(key === '0' || key === '1' || key === '2' || key === '3')) {
+                    if (!(key === '0' || key === '1' || key === '2' || key === '3' || keyIsBackspace || keyIsLeftOrRightArrow || evntIsSelectionOrCopyOrUndo)) {
                         event.preventDefault();
                         return;
                     }
                     break;
                 case 2:
-                    if (!(key === '0' || key === '1' || keyIsBackspace)) {
+                    if (!(key === '0' || key === '1' || keyIsBackspace || keyIsLeftOrRightArrow || evntIsSelectionOrCopyOrUndo)) {
                         event.preventDefault();
                         return;
                     }

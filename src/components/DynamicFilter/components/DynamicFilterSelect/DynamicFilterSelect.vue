@@ -135,9 +135,9 @@ export default class DynamicFilterSelect extends Vue {
                 this.$emit('optionSelected', selectedOption);
             } else {
                 selectedOption.selected = true;
-                const previouslyAdded: number = this.selectedOptions.filter(x => x.value === selectedOption.value).length;
+                // const previouslyAdded: number = this.selectedOptions.filter(x => x.value === selectedOption.value).length;
                 const selectedOptionClone: DynamicFilterSelectOption = JSON.parse(JSON.stringify(selectedOption));
-                selectedOptionClone.index = selectedOptionClone.value + previouslyAdded;
+                selectedOptionClone.index = this.generateId();
                 this.selectedOptions.push(selectedOptionClone);
                 this.$emit('optionSelected', selectedOptionClone);
             }
@@ -156,6 +156,12 @@ export default class DynamicFilterSelect extends Vue {
     public triggerReactivityAfterOptionSelection(): void {
         this.showOptions = false;
         this.showOptions = true;
+    }
+
+    public generateId(): string {
+        const typedArray: Uint8Array = new Uint8Array(10);
+        const randomValues: Uint8Array = window.crypto.getRandomValues(typedArray);
+        return randomValues.join('');
     }
 }
 </script>
