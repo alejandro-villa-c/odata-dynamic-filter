@@ -306,7 +306,6 @@ class DynamicFilter extends Vue {
                         }
                         break;
                     case DynamicFilterFieldType.DATEPICKER:
-                        field.value = this.formatDate(new Date());
                         field.comparativeOperator = comparativeOperatorsClone[1].value;
                         field.comparativeOperators.push(comparativeOperatorsClone[1]);
                         field.comparativeOperators.push(comparativeOperatorsClone[2]);
@@ -414,8 +413,12 @@ class DynamicFilter extends Vue {
                 let valueTransformedByField: any = null;
                 switch (field.type) {
                     case DynamicFilterFieldType.DATEPICKER:
-                        valueTransformedByField = this.formatDate(this.stringToDate(modifiedValue), true);
-                        filterQuery += this.getComparativeExpression(field.comparativeOperator, field.fieldName, valueTransformedByField);
+                        if (modifiedValue.length === 10) {
+                            valueTransformedByField = this.formatDate(this.stringToDate(modifiedValue), true);
+                            filterQuery += this.getComparativeExpression(field.comparativeOperator, field.fieldName, valueTransformedByField);
+                        } else {
+                            filterQuery = '';
+                        }
                         break;
                     case DynamicFilterFieldType.NUMBER:
                         filterQuery += this.getComparativeExpression(field.comparativeOperator, field.fieldName, modifiedValue);
@@ -488,7 +491,7 @@ class DynamicFilter extends Vue {
     }
 
     public stringToDate(date: string): Date {
-        if (date) {
+        if (!!date && date.length === 10) {
             const dateSplitted: string[] = date.split('/');
             const year: number = Number(dateSplitted[2]);
             const month: number = Number(dateSplitted[1]) - 1;
@@ -501,21 +504,25 @@ class DynamicFilter extends Vue {
     }
 
     public formatDate(d: Date, isIso8601: boolean = false): string {
-        let month: string = (d.getMonth() + 1).toString();
-        let day: string = d.getDate().toString();
-        const year: number = d.getFullYear();
+        if (!!d) {
+            let month: string = (d.getMonth() + 1).toString();
+            let day: string = d.getDate().toString();
+            const year: number = d.getFullYear();
 
-        if (month.length < 2) {
-            month = '0' + month;
-        }
-        if (day.length < 2) {
-            day = '0' + day;
-        } 
+            if (month.length < 2) {
+                month = '0' + month;
+            }
+            if (day.length < 2) {
+                day = '0' + day;
+            } 
 
-        if (isIso8601) {
-            return [year, month, day].join('-');
+            if (isIso8601) {
+                return [year, month, day].join('-');
+            } else {
+                return [day, month, year].join('/');
+            }
         } else {
-            return [day, month, year].join('/');
+            return '';
         }
     }
 
